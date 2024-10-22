@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use bevy::prelude::*;
 use noise::{NoiseFn, Perlin};
-use crate::components::world::CHUNK_SIZE;
+use crate::components::world::{CHUNK_SIZE, NOISE_SCALE, SEED};
 
 pub struct Chunk {
     pub tiles: Vec<Tile>,
@@ -12,7 +12,7 @@ impl Chunk {
     pub(crate) fn new(chunk_coords: (i64, i64)) -> Self {
         info!("Generating chunk at coordinates: {:?}", chunk_coords);
 
-        let perlin = Perlin::new(1321231231);
+        let perlin = Perlin::new(SEED);
         let mut tiles = Vec::new();
 
         for x in 0..CHUNK_SIZE {
@@ -20,7 +20,7 @@ impl Chunk {
                 let world_x = chunk_coords.0 * CHUNK_SIZE as i64 + x as i64;
                 let world_y = chunk_coords.1 * CHUNK_SIZE as i64 + y as i64;
 
-                let noise_value = perlin.get([world_x as f64 * 0.1, world_y as f64 * 0.1]);
+                let noise_value = perlin.get([world_x as f64 * NOISE_SCALE, world_y as f64 * NOISE_SCALE]);
 
                 let tile_type = if noise_value > 0.5 {
                     TileType::Grass
